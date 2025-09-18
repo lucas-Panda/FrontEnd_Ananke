@@ -22,7 +22,7 @@ const Usuario = () => {
         email: ''
     };
 
-    const [usuarios, setUsuarios] = useState<Projeto.Usuario[]>([]);
+    const [usuarios, setUsuarios] = useState<Projeto.Usuario[] | null>(null);
     const [usuarioDialog, setUsuarioDialog] = useState(false);
     const [deleteUsuarioDialog, setDeleteUsuarioDialog] = useState(false);
     const [deleteUsuariosDialog, setDeleteUsuariosDialog] = useState(false);
@@ -35,7 +35,7 @@ const Usuario = () => {
     const usuarioService = useMemo(() => new UsuarioService(), []);
 
     useEffect(() => {
-        if (usuarios.length == 0) {
+        if (!usuarios) {
             usuarioService.listarTodos()
                 .then((response) => {
                     console.log(response.data);
@@ -73,7 +73,7 @@ const Usuario = () => {
                 .then((Response) => {
                     setUsuarioDialog(false);
                     setUsuario(usuarioVazio);
-                    setUsuarios([]);
+                    setUsuarios(null);
                     toast.current?.show({
                         severity: 'info',
                         summary: 'Sucesso!',
@@ -92,7 +92,7 @@ const Usuario = () => {
             usuarioService.alterar(usuario).then((response) => {
                 setUsuarioDialog(false);
                 setUsuario(usuarioVazio);
-                setUsuarios([]);
+                setUsuarios(null);
                 toast.current?.show({
                     severity: 'info',
                     summary: 'Sucesso!',
@@ -126,7 +126,7 @@ const Usuario = () => {
                 .then((response) => {
                     setUsuario(usuarioVazio);
                     setDeleteUsuarioDialog(false);
-                    setUsuarios([]);
+                    setUsuarios(null);
                     toast.current?.show({
                         severity: 'info',
                         summary: 'Sucesso!',
@@ -161,7 +161,7 @@ const Usuario = () => {
 
             }
         })).then((response) => {
-            setUsuarios([]);
+            setUsuarios(null);
             setSelectedUsuarios([]);
             setDeleteUsuarioDialog(false);
             toast.current?.show({

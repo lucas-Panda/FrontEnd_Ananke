@@ -11,71 +11,70 @@ import { Toolbar } from 'primereact/toolbar';
 import { classNames } from 'primereact/utils';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Projeto } from '@/types';
-import { RecursoService } from '@/service/RecursoService';
+import { PerfilService } from '@/service/PerfilService';
 
-const Recurso = () => {
-    let recursoVazio: Projeto.Recurso = {
+const Perfil = () => {
+    let perfilVazio: Projeto.Perfil = {
         id: undefined,
-        nome: '',
-        chave: ''
+        descricao: ''
     };
 
-    const [recursos, setRecursos] = useState<Projeto.Recurso[] | null>(null);
-    const [recursoDialog, setRecursoDialog] = useState(false);
-    const [deleteRecursoDialog, setDeleteRecursoDialog] = useState(false);
-    const [deleteRecursosDialog, setDeleteRecursosDialog] = useState(false);
-    const [recurso, setRecurso] = useState<Projeto.Recurso>(recursoVazio);
-    const [selectedRecursos, setSelectedRecursos] = useState<Projeto.Recurso[]>([]);
+    const [perfis, setPerfils] = useState<Projeto.Perfil[] | null>(null);
+    const [perfilDialog, setPerfilDialog] = useState(false);
+    const [deletePerfilDialog, setDeletePerfilDialog] = useState(false);
+    const [deletePerfilsDialog, setDeletePerfilsDialog] = useState(false);
+    const [perfil, setPerfil] = useState<Projeto.Perfil>(perfilVazio);
+    const [selectedPerfils, setSelectedPerfils] = useState<Projeto.Perfil[]>([]);
     const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState('');
     const toast = useRef<Toast>(null);
     const dt = useRef<DataTable<any>>(null);
-    const recursoService = useMemo(() => new RecursoService(), []);
+    const perfilService = useMemo(() => new PerfilService(), []);
 
     useEffect(() => {
-        if (!recursos) {
-            recursoService.listarTodos()
+        if (!perfis) {
+            perfilService.listarTodos()
                 .then((response) => {
                     console.log(response.data);
-                    setRecursos(response.data)
+                    setPerfils(response.data)
                 }).catch((error) => {
                     console.log(error)
                 })
         }
-    }, [recursoService, recursos]);
+    }, [perfilService, perfis]);
 
     const openNew = () => {
-        setRecurso(recursoVazio);
+        setPerfil(perfilVazio);
         setSubmitted(false);
-        setRecursoDialog(true);
+        setPerfilDialog(true);
     };
 
     const hideDialog = () => {
         setSubmitted(false);
-        setRecursoDialog(false);
+        setPerfilDialog(false);
     };
 
-    const hideDeleteRecursoDialog = () => {
-        setDeleteRecursoDialog(false);
+    const hideDeletePerfilDialog = () => {
+        setDeletePerfilDialog(false);
     };
 
-    const hideDeleteRecursosDialog = () => {
-        setDeleteRecursosDialog(false);
+    const hideDeletePerfilsDialog = () => {
+        setDeletePerfilsDialog(false);
     };
 
-    const saveRecurso = () => {
+    const savePerfil = () => {
         setSubmitted(true);
 
-        if (!recurso.id) {
-            recursoService.inserir(recurso)
+        if (!perfil.id) {
+            perfilService.inserir(perfil)
                 .then((Response) => {
-                    setRecursoDialog(false);
-                    setRecurso(recursoVazio);
-                    setRecursos(null);
+                    setPerfilDialog(false);
+                    setPerfil(perfilVazio);
+                    setPerfils(null);
                     toast.current?.show({
                         severity: 'info',
                         summary: 'Sucesso!',
-                        detail: 'Recurso cadastrado com sucesso'
+                        detail: 'Perfil cadastrado com sucesso'
                     });
                 }).catch((error) => {
                     const msg = error.response?.data?.message || error.message || "erro desconhecido";
@@ -87,14 +86,14 @@ const Recurso = () => {
                     })
                 });
         } else {
-            recursoService.alterar(recurso).then((response) => {
-                setRecursoDialog(false);
-                setRecurso(recursoVazio);
-                setRecursos(null);
+            perfilService.alterar(perfil).then((response) => {
+                setPerfilDialog(false);
+                setPerfil(perfilVazio);
+                setPerfils(null);
                 toast.current?.show({
                     severity: 'info',
                     summary: 'Sucesso!',
-                    detail: 'Recurso Alterado com sucesso'
+                    detail: 'Perfil Alterado com sucesso'
                 });
             }).catch((error) => {
                 const msg = error.response?.data?.message || error.message || "erro desconhecido";
@@ -108,27 +107,27 @@ const Recurso = () => {
         }
     };
 
-    const editRecurso = (recurso: Projeto.Recurso) => {
-        setRecurso({ ...recurso });
-        setRecursoDialog(true);
+    const editPerfil = (perfil: Projeto.Perfil) => {
+        setPerfil({ ...perfil });
+        setPerfilDialog(true);
     };
 
-    const confirmDeleteRecurso = (recurso: Projeto.Recurso) => {
-        setRecurso(recurso);
-        setDeleteRecursoDialog(true);
+    const confirmDeletePerfil = (perfil: Projeto.Perfil) => {
+        setPerfil(perfil);
+        setDeletePerfilDialog(true);
     };
 
-    const deleteRecurso = () => {
-        if (recurso.id) {
-            recursoService.excluir(recurso.id)
+    const deletePerfil = () => {
+        if (perfil.id) {
+            perfilService.excluir(perfil.id)
                 .then((response) => {
-                    setRecurso(recursoVazio);
-                    setDeleteRecursoDialog(false);
-                    setRecursos(null);
+                    setPerfil(perfilVazio);
+                    setDeletePerfilDialog(false);
+                    setPerfils(null);
                     toast.current?.show({
                         severity: 'info',
                         summary: 'Sucesso!',
-                        detail: 'Recurso Deletado com sucesso',
+                        detail: 'Perfil Deletado com sucesso',
                         life: 3000
                     });
                 }).catch((error) => {
@@ -149,30 +148,30 @@ const Recurso = () => {
     };
 
     const confirmDeleteSelected = () => {
-        setDeleteRecursosDialog(true);
+        setDeletePerfilsDialog(true);
     };
 
-    const deleteSelectedRecursos = () => {
-        Promise.all(selectedRecursos.map(async (_recurso) => {
-            if (_recurso.id) {
-                await recursoService.excluir(_recurso.id)
+    const deleteSelectedPerfils = () => {
+        Promise.all(selectedPerfils.map(async (_perfil) => {
+            if (_perfil.id) {
+                await perfilService.excluir(_perfil.id)
 
             }
         })).then((response) => {
-            setRecursos(null);
-            setSelectedRecursos([]);
-            setDeleteRecursosDialog(false);
+            setPerfils(null);
+            setSelectedPerfils([]);
+            setDeletePerfilsDialog(false);
             toast.current?.show({
                 severity: 'info',
                 summary: 'Sucesso!',
-                detail: 'Recursos Deletados com sucesso',
+                detail: 'Perfils Deletados com sucesso',
                 life: 3000
             });
         }).catch((error) => {
             toast.current?.show({
                 severity: 'error',
                 summary: 'Erro!',
-                detail: 'Erro ao Deletar Recursos!',
+                detail: 'Erro ao Deletar Perfils!',
                 life: 3000
             });
         });
@@ -180,10 +179,10 @@ const Recurso = () => {
 
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, name: string) => {
         const val = (e.target && e.target.value) || '';
-        let _recurso = { ...recurso };
-        _recurso[`${name}`] = val;
+        let _perfil = { ...perfil };
+        _perfil[`${name}`] = val;
 
-        setRecurso(_recurso);
+        setPerfil(_perfil);
     };
 
     const leftToolbarTemplate = () => {
@@ -191,7 +190,7 @@ const Recurso = () => {
             <React.Fragment>
                 <div className="my-2">
                     <Button label="Novo" icon="pi pi-plus" severity="success" className=" mr-2" onClick={openNew} />
-                    <Button label="Excluir" icon="pi pi-trash" severity="danger" onClick={confirmDeleteSelected} disabled={!selectedRecursos || !(selectedRecursos as any).length} />
+                    <Button label="Excluir" icon="pi pi-trash" severity="danger" onClick={confirmDeleteSelected} disabled={!selectedPerfils || !(selectedPerfils as any).length} />
                 </div>
             </React.Fragment>
         );
@@ -206,7 +205,7 @@ const Recurso = () => {
         );
     };
 
-    const idBodyTemplate = (rowData: Projeto.Recurso) => {
+    const idBodyTemplate = (rowData: Projeto.Perfil) => {
         return (
             <>
                 <span className="p-column-title">Código</span>
@@ -215,36 +214,27 @@ const Recurso = () => {
         );
     };
 
-    const nomeBodyTemplate = (rowData: Projeto.Recurso) => {
+    const descricaoBodyTemplate = (rowData: Projeto.Perfil) => {
         return (
             <>
-                <span className="p-column-title">Nome</span>
-                {rowData.nome}
+                <span className="p-column-title">Descrição</span>
+                {rowData.descricao}
             </>
         );
     };
 
-    const chaveBodyTemplate = (rowData: Projeto.Recurso) => {
+    const actionBodyTemplate = (rowData: Projeto.Perfil) => {
         return (
             <>
-                <span className="p-column-title">Chave</span>
-                {rowData.chave}
-            </>
-        );
-    };
-
-    const actionBodyTemplate = (rowData: Projeto.Recurso) => {
-        return (
-            <>
-                <Button icon="pi pi-pencil" rounded severity="success" className="mr-2" onClick={() => editRecurso(rowData)} />
-                <Button icon="pi pi-trash" rounded severity="warning" onClick={() => confirmDeleteRecurso(rowData)} />
+                <Button icon="pi pi-pencil" rounded severity="success" className="mr-2" onClick={() => editPerfil(rowData)} />
+                <Button icon="pi pi-trash" rounded severity="warning" onClick={() => confirmDeletePerfil(rowData)} />
             </>
         );
     };
 
     const header = (
         <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-            <h5 className="m-0">Gerenciamento de Recursos</h5>
+            <h5 className="m-0">Gerenciamento de Perfils</h5>
             <span className="block mt-2 md:mt-0 p-input-icon-left">
                 <i className="pi pi-search" />
                 <InputText type="search" onInput={(e) => setGlobalFilter(e.currentTarget.value)} placeholder="Search..." />
@@ -252,22 +242,22 @@ const Recurso = () => {
         </div>
     );
 
-    const recursoDialogFooter = (
+    const perfilDialogFooter = (
         <>
             <Button label="Cancelar" icon="pi pi-times" text onClick={hideDialog} />
-            <Button label="Salvar" icon="pi pi-check" text onClick={saveRecurso} />
+            <Button label="Salvar" icon="pi pi-check" text onClick={savePerfil} />
         </>
     );
-    const deleteRecursoDialogFooter = (
+    const deletePerfilDialogFooter = (
         <>
-            <Button label="Não" icon="pi pi-times" text onClick={hideDeleteRecursoDialog} />
-            <Button label="Sim" icon="pi pi-check" text onClick={deleteRecurso} />
+            <Button label="Não" icon="pi pi-times" text onClick={hideDeletePerfilDialog} />
+            <Button label="Sim" icon="pi pi-check" text onClick={deletePerfil} />
         </>
     );
-    const deleteRecursosDialogFooter = (
+    const deletePerfilsDialogFooter = (
         <>
-            <Button label="Não" icon="pi pi-times" text onClick={hideDeleteRecursosDialog} />
-            <Button label="Sim" icon="pi pi-check" text onClick={deleteSelectedRecursos} />
+            <Button label="Não" icon="pi pi-times" text onClick={hideDeletePerfilsDialog} />
+            <Button label="Sim" icon="pi pi-check" text onClick={deleteSelectedPerfils} />
         </>
     );
 
@@ -280,59 +270,43 @@ const Recurso = () => {
 
                     <DataTable
                         ref={dt}
-                        value={recursos}
-                        selection={selectedRecursos}
-                        onSelectionChange={(e) => setSelectedRecursos(e.value as any)}
+                        value={perfis}
+                        selection={selectedPerfils}
+                        onSelectionChange={(e) => setSelectedPerfils(e.value as any)}
                         dataKey="id"
                         paginator
                         rows={10}
                         rowsPerPageOptions={[5, 10, 25]}
                         className="datatable-responsive"
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                        currentPageReportTemplate="Mostrando {first} até {last} de {totalRecords} recursos"
+                        currentPageReportTemplate="Mostrando {first} até {last} de {totalRecords} Perfils"
                         globalFilter={globalFilter}
-                        emptyMessage="nenhum recurso encontrado."
+                        emptyMessage="nenhum perfil encontrado."
                         header={header}
                         responsiveLayout="scroll"
                     >
                         <Column selectionMode="multiple" headerStyle={{ width: '4rem' }}></Column>
                         <Column field="id" header="Código" sortable body={idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="nome" header="Nome" sortable body={nomeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="chave" header="Chave" sortable body={chaveBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-
+                        <Column field="descricao" header="Descrição" sortable body={descricaoBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                     </DataTable>
 
-                    <Dialog visible={recursoDialog} style={{ width: '450px' }} header="Recursos" modal className="p-fluid" footer={recursoDialogFooter} onHide={hideDialog}>
-                        <form onSubmit={(e) => { e.preventDefault(); saveRecurso(); }}>
+                    <Dialog visible={perfilDialog} style={{ width: '450px' }} header="Perfils" modal className="p-fluid" footer={perfilDialogFooter} onHide={hideDialog}>
+                        <form onSubmit={(e) => { e.preventDefault(); savePerfil(); }}>
                             
                             <div className="field">
-                                <label htmlFor="nome">Nome</label>
+                                <label htmlFor="descricao">Descrição</label>
                                 <InputText
-                                    id="nome"
-                                    value={recurso.nome}
-                                    onChange={(e) => onInputChange(e, 'nome')}
+                                    id="descricao"
+                                    value={perfil.descricao}
+                                    onChange={(e) => onInputChange(e, 'descricao')}
                                     required
                                     autoFocus
                                     className={classNames({
-                                        'p-invalid': submitted && !recurso.nome
+                                        'p-invalid': submitted && !perfil.descricao
                                     })}
                                 />
-                                {submitted && !recurso.nome && <small className="p-invalid">nome Obrigatorio.</small>}
-                            </div>
-
-                            <div className="field">
-                                <label htmlFor="chave">Chave</label>
-                                <InputText
-                                    id="chave"
-                                    value={recurso.chave}
-                                    onChange={(e) => onInputChange(e, 'chave')}
-                                    required
-                                    className={classNames({
-                                        'p-invalid': submitted && !recurso.chave
-                                    })}
-                                />
-                                {submitted && !recurso.chave && <small className="p-invalid">Chave é Obrigatorio.</small>}
+                                {submitted && !perfil.descricao && <small className="p-invalid">Descrição Obrigatorio.</small>}
                             </div>
                             {}
                             <Button type='submit' style={{ display: 'none' }} />
@@ -340,21 +314,21 @@ const Recurso = () => {
                     </Dialog>
 
 
-                    <Dialog visible={deleteRecursoDialog} style={{ width: '450px' }} header="Confirmar" modal footer={deleteRecursoDialogFooter} onHide={hideDeleteRecursoDialog}>
+                    <Dialog visible={deletePerfilDialog} style={{ width: '450px' }} header="Confirmar" modal footer={deletePerfilDialogFooter} onHide={hideDeletePerfilDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {recurso && (
+                            {perfil && (
                                 <span>
-                                    Você realmente deseja deletar o Recurso <b>{recurso.nome}</b>?
+                                    Você realmente deseja deletar o Perfil <b>{perfil.descricao}</b>?
                                 </span>
                             )}
                         </div>
                     </Dialog>
 
-                    <Dialog visible={deleteRecursosDialog} style={{ width: '450px' }} header="Confirmar" modal footer={deleteRecursosDialogFooter} onHide={hideDeleteRecursosDialog}>
+                    <Dialog visible={deletePerfilsDialog} style={{ width: '450px' }} header="Confirmar" modal footer={deletePerfilsDialogFooter} onHide={hideDeletePerfilsDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {recursos && <span>Você realmente deseja deletar os recursos selecionados?</span>}
+                            {perfis && <span>Você realmente deseja deletar os Perfils selecionados?</span>}
                         </div>
                     </Dialog>
                 </div>
@@ -363,4 +337,4 @@ const Recurso = () => {
     );
 };
 
-export default Recurso;
+export default Perfil;
