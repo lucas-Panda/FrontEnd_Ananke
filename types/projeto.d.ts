@@ -1,3 +1,5 @@
+import Perfil from "@/app/(main)/pages/perfil/page";
+
 declare namespace Projeto {
 
     type Usuario = {
@@ -23,5 +25,11 @@ declare namespace Projeto {
         id?: number;
         perfil: Perfil;
         usuario: Usuario;
+    }
+
+    type PermissaoPerfilRecurso = {
+        id?: number;
+        perfil: Perfil;
+        recurso: Recurso;
     }
 }
